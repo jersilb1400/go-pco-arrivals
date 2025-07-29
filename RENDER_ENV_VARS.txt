@@ -1,0 +1,9 @@
+# Copy these environment variables to Render Dashboard
+# Replace the placeholder values with your actual credentials
+
+MONGODB_URI=mongodb+srv://jeremy:tn8KBdz5M39nhCNr@cluster0.8zrrvsj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+MONGODB_DATABASE=go-pco-arrivals-dashboard
+PCO_CLIENT_ID=YOUR_PCO_CLIENT_ID_HERE
+PCO_CLIENT_SECRET=YOUR_PCO_CLIENT_SECRET_HERE
+SESSION_SECRET=YIVWPwOmXOr8UY3cwXD7eJeVGFiL/vuV6/gLdrOBnzA=
+JWT_SECRET=88Os98iSRtVVtHnAYHvPt6c9eatogKIK2BVGum4l74M= 

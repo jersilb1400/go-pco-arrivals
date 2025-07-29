@@ -1,0 +1,60 @@
+services:
+  - type: web
+    name: go-pco-arrivals-dashboard
+    env: docker
+    plan: starter
+    region: oregon
+    buildCommand: |
+      # Build the Go backend
+      go mod download
+      go build -o main .
+      
+      # Build the React frontend
+      cd frontend
+      npm ci
+      npm run build
+      cd ..
+      
+      # Copy frontend build to backend
+      cp -r frontend/dist web/static
+    startCommand: ./main
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PORT
+        value: 3000
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY
+        value: true
+      - key: CORS_ORIGINS
+        value: https://go-pco-arrivals-dashboard.onrender.com
+      - key: DATABASE_TYPE
+        value: mongodb
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DATABASE
+        value: go-pco-arrivals-dashboard
+      - key: PCO_CLIENT_ID
+        sync: false
+      - key: PCO_CLIENT_SECRET
+        sync: false
+      - key: PCO_REDIRECT_URI
+        value: https://go-pco-arrivals-dashboard.onrender.com/auth/callback
+      - key: SESSION_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: LOG_LEVEL
+        value: info
+      - key: METRICS_ENABLED
+        value: true
+    healthCheckPath: /health
+    autoDeploy: true
+    branch: main
+
+databases:
+  - name: go-pco-arrivals-dashboard
+    databaseName: go-pco-arrivals-dashboard
+    plan: free
+    region: oregon

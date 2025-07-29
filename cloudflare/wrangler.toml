@@ -1,0 +1,35 @@
+name = "pco-arrivals-billboard"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+name = "pco-arrivals-billboard-prod"
+route = "your-domain.com/*"
+zone_id = "your-zone-id"
+
+[env.staging]
+name = "pco-arrivals-billboard-staging"
+route = "staging.your-domain.com/*"
+zone_id = "your-zone-id"
+
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "service-worker"
+
+[[env.production.vars]]
+PCO_CLIENT_ID = "your_pco_client_id"
+PCO_CLIENT_SECRET = "your_pco_client_secret"
+ENVIRONMENT = "production"
+
+[[env.staging.vars]]
+PCO_CLIENT_ID = "your_pco_client_id"
+PCO_CLIENT_SECRET = "your_pco_client_secret"
+ENVIRONMENT = "staging"
+
+[env.production.kv_namespaces]
+PCO_DATA = { binding = "PCO_DATA", id = "your-kv-namespace-id" }
+
+[env.staging.kv_namespaces]
+PCO_DATA = { binding = "PCO_DATA", id = "your-staging-kv-namespace-id" } 

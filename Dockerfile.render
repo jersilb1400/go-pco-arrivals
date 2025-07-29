@@ -1,0 +1,64 @@
+# Multi-stage build for Render deployment
+FROM golang:1.24-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git ca-certificates tzdata build-base nodejs npm
+
+# Set working directory
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the Go backend
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build     -a -installsuffix cgo     -ldflags="-w -s -X main.Version=$(git describe --tags --always --dirty 2>/dev/null || echo 'dev')"     -o main .
+
+# Build the React frontend
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci --only=production
+COPY frontend/ .
+RUN npm run build
+
+# Production stage
+FROM alpine:latest
+
+# Install runtime dependencies
+RUN apk --no-cache add     ca-certificates     tzdata     && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup &&     adduser -u 1001 -S appuser -G appgroup
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs /app/web/static &&     chown -R appuser:appgroup /app
+
+# Set working directory
+WORKDIR /app
+
+# Copy binary from builder stage
+COPY --from=builder /app/main .
+
+# Copy frontend build
+COPY --from=builder /app/frontend/dist ./web/static
+
+# Set proper ownership
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Run the application
+CMD ["./main"]
