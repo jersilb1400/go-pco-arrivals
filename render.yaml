@@ -4,20 +4,7 @@ services:
     env: docker
     plan: starter
     region: oregon
-    buildCommand: |
-      # Build the Go backend
-      go mod download
-      go build -o main .
-      
-      # Build the React frontend
-      cd frontend
-      npm ci
-      npm run build
-      cd ..
-      
-      # Copy frontend build to backend
-      cp -r frontend/dist web/static
-    startCommand: ./main
+    dockerfilePath: ./Dockerfile.render
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -58,3 +45,4 @@ databases:
     databaseName: go-pco-arrivals-dashboard
     plan: free
     region: oregon
+    dockerfilePath: ./Dockerfile.render
