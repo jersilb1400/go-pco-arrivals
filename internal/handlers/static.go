@@ -11,37 +11,37 @@ func NewStaticHandler() *StaticHandler {
 }
 
 func (h *StaticHandler) ServeIndex(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/index.html")
+	return c.SendFile("./web/static/index.html")
 }
 
 func (h *StaticHandler) ServeAdmin(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/index.html")
+	return c.SendFile("./web/static/index.html")
 }
 
 func (h *StaticHandler) ServeBillboard(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/index.html")
+	return c.SendFile("./web/static/index.html")
 }
 
 func (h *StaticHandler) ServeLocationBillboard(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/index.html")
+	return c.SendFile("./web/static/index.html")
 }
 
 func (h *StaticHandler) ServeLogin(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/index.html")
+	return c.SendFile("./web/static/index.html")
 }
 
 func (h *StaticHandler) ServeOffline(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/index.html")
+	return c.SendFile("./web/static/index.html")
 }
 
 func (h *StaticHandler) ServeManifest(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/manifest.json")
+	return c.SendFile("./web/static/manifest.json")
 }
 
 func (h *StaticHandler) ServeServiceWorker(c *fiber.Ctx) error {
-	return c.SendFile("./frontend/dist/sw.js")
+	return c.SendFile("./web/static/sw.js")
 }
 
 func (h *StaticHandler) Handle404(c *fiber.Ctx) error {
-	return c.Status(404).SendFile("./frontend/dist/index.html")
+	return c.Status(404).SendFile("./web/static/index.html")
 }
