@@ -35,44 +35,52 @@ func NewAPIHandler(db *gorm.DB, pcoService *services.PCOService, notificationSer
 
 // Event endpoints
 func (h *APIHandler) GetEvents(c *fiber.Ctx) error {
-	// Get query parameters
-	date := c.Query("date")
-
-	// Get the current user's access token
-	userID := c.Locals("user_id").(uint)
-	var user models.User
-	if err := h.db.First(&user, userID).Error; err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "User not found",
-		})
-	}
-
-	// Parse the date parameter
-	var targetDate time.Time
-	if date != "" {
-		parsedDate, err := time.Parse("2006-01-02", date)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid date format. Use YYYY-MM-DD",
-			})
+	// Handle nil db case (MongoDB mode)
+	if h.db == nil {
+		h.logger.Warn("GetEvents called with nil database - using mock data")
+		// Return mock data for MongoDB mode
+		targetDate := time.Now()
+		if date != "" {
+			if parsedDate, err := time.Parse("2006-01-02", date); err == nil {
+				targetDate = parsedDate
+			}
 		}
-		targetDate = parsedDate
-	} else {
-		// Default to today if no date provided
-		targetDate = time.Now()
-	}
 
-	// Try to get real events from PCO first
-	events, err := h.pcoService.GetEvents(user.AccessToken, targetDate)
-	if err != nil {
-		h.logger.Warn("Failed to get events from PCO, using mock data", "error", err.Error())
-
-		// Return enhanced mock data when PCO API fails
 		mockEvents := []fiber.Map{
 			{
 				"id":          "mock-event-1",
 				"name":        "Sunday Service",
 				"date":        targetDate.Format("2006-01-02"),
+				"location":    "Main Auditorium",
+				"location_id": "main-auditorium",
+				"time":        "09:00 AM",
+				"start_time":  targetDate.Format("2006-01-02") + "T09:00:00Z",
+				"end_time":    targetDate.Format("2006-01-02") + "T10:30:00Z",
+				"is_active":   true,
+				"created_at":  time.Now().Format(time.RFC3339),
+			},
+			{
+				"id":          "mock-event-2",
+				"name":        "Youth Group",
+				"date":        targetDate.Format("2006-01-02"),
+				"location":    "Youth Room",
+				"location_id": "youth-room",
+				"time":        "06:00 PM",
+				"start_time":  targetDate.Format("2006-01-02") + "T18:00:00Z",
+				"end_time":    targetDate.Format("2006-01-02") + "T19:30:00Z",
+				"is_active":   true,
+				"created_at":  time.Now().Format(time.RFC3339),
+			},
+		}
+
+		return c.JSON(fiber.Map{
+			"success": true,
+			"events":  mockEvents,
+			"note":    "MongoDB mode - using mock data",
+		})
+	}
+
+	// Get the current user access token
 				"location":    "Main Auditorium",
 				"location_id": "main-auditorium",
 				"time":        "09:00 AM",

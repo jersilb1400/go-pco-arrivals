@@ -106,13 +106,28 @@ func main() {
 		return c.Next()
 	})
 
-	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(cfg, gormDB, logger, authService, pcoService)
-	apiHandler := handlers.NewAPIHandler(gormDB, pcoService, notificationService, billboardService, wsHub, logger)
+	// Initialize handlers based on database type
+	var authHandler *handlers.AuthHandler
+	var apiHandler *handlers.APIHandler
+	var healthHandler *handlers.HealthHandler
+	var billboardHandler *handlers.BillboardHandler
+
+	if db.GetType() == database.SQLiteDB {
+		// SQLite handlers
+		authHandler = handlers.NewAuthHandler(cfg, gormDB, logger, authService, pcoService)
+		apiHandler = handlers.NewAPIHandler(gormDB, pcoService, notificationService, billboardService, wsHub, logger)
+		healthHandler = handlers.NewHealthHandler(gormDB)
+		billboardHandler = handlers.NewBillboardHandler(cfg, gormDB, logger, billboardService, pcoService)
+	} else if db.GetType() == database.MongoDBDB {
+		// MongoDB handlers - these need to be updated to handle nil GORM DB
+		authHandler = handlers.NewAuthHandler(cfg, nil, logger, authService, pcoService)
+		apiHandler = handlers.NewAPIHandler(nil, pcoService, notificationService, billboardService, wsHub, logger)
+		healthHandler = handlers.NewHealthHandler(nil)
+		billboardHandler = handlers.NewBillboardHandler(cfg, nil, logger, billboardService, pcoService)
+	}
+
 	staticHandler := handlers.NewStaticHandler()
 	websocketHandler := handlers.NewWebSocketHandler(wsHub, authService)
-	healthHandler := handlers.NewHealthHandler(gormDB)
-	billboardHandler := handlers.NewBillboardHandler(cfg, gormDB, logger, billboardService, pcoService)
 
 	// Setup routes
 	setupRoutes(app, authHandler, apiHandler, staticHandler, websocketHandler, healthHandler, billboardHandler)

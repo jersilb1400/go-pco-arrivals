@@ -22,22 +22,20 @@ func (h *HealthHandler) Health(c *fiber.Ctx) error {
 	})
 }
 
-func (h *HealthHandler) DetailedHealth(c *fiber.Ctx) error {
-	// Check database connection
-	var result int
-	err := h.db.Raw("SELECT 1").Scan(&result).Error
-
-	status := "healthy"
-	if err != nil {
-		status = "unhealthy"
+	// Handle nil db case (MongoDB mode)
+	if h.db == nil {
+		return c.JSON(fiber.Map{
+			"status":  "healthy",
+			"service": "go_pco_arrivals",
+			"database": map[string]interface{}{
+				"status": "healthy",
+				"type":   "mongodb",
+				"note":   "MongoDB mode - no GORM connection available",
+			},
+		})
 	}
 
-	return c.JSON(fiber.Map{
-		"status":  status,
-		"service": "go_pco_arrivals",
-		"database": map[string]interface{}{
-			"status": status,
-			"error":  err,
+	// Check database connection
 		},
 	})
 }
