@@ -11,37 +11,37 @@ func NewStaticHandler() *StaticHandler {
 }
 
 func (h *StaticHandler) ServeIndex(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Index page"})
+	return c.SendFile("./frontend/dist/index.html")
 }
 
 func (h *StaticHandler) ServeAdmin(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Admin page"})
+	return c.SendFile("./frontend/dist/index.html")
 }
 
 func (h *StaticHandler) ServeBillboard(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Billboard page"})
+	return c.SendFile("./frontend/dist/index.html")
 }
 
 func (h *StaticHandler) ServeLocationBillboard(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Location billboard page"})
+	return c.SendFile("./frontend/dist/index.html")
 }
 
 func (h *StaticHandler) ServeLogin(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Login page"})
+	return c.SendFile("./frontend/dist/index.html")
 }
 
 func (h *StaticHandler) ServeOffline(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Offline page"})
+	return c.SendFile("./frontend/dist/index.html")
 }
 
 func (h *StaticHandler) ServeManifest(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Manifest"})
+	return c.SendFile("./frontend/dist/manifest.json")
 }
 
 func (h *StaticHandler) ServeServiceWorker(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"message": "Service worker"})
+	return c.SendFile("./frontend/dist/sw.js")
 }
 
 func (h *StaticHandler) Handle404(c *fiber.Ctx) error {
-	return c.Status(404).JSON(fiber.Map{"error": "Not found"})
+	return c.Status(404).SendFile("./frontend/dist/index.html")
 }
